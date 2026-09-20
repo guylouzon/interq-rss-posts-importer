@@ -326,6 +326,10 @@ class InterQ_Rss_Pi_Admin {
             wp_send_json_error(['message' => 'Invalid request']);
         }
 
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Insufficient permissions']);
+        }
+
         $ajax_feed_id = sanitize_key( wp_unslash( $_POST['feed_id'] ) );
         $ajax_add = true;
         include( INTERQ_RSS_PI_PATH . 'app/templates/feed-table-row.php');
@@ -335,6 +339,10 @@ class InterQ_Rss_Pi_Admin {
     public function edit_row(): void {
         if (! isset($_POST['feed_id']) || ! isset($_POST['interq_rss_pi_ajax_nonce']) || ! wp_verify_nonce(sanitize_key($_POST['interq_rss_pi_ajax_nonce']), 'interq_rss_pi_ajax_nonce_action')) {
             wp_send_json_error(['message' => 'Invalid request']);
+        }
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Insufficient permissions']);
         }
 
         $ajax_feed_id = sanitize_key( wp_unslash( $_POST['feed_id'] ) );
@@ -354,6 +362,10 @@ class InterQ_Rss_Pi_Admin {
     public function ajax_stats(): void {
         if (! isset($_POST['interq_rss_pi_ajax_nonce']) || ! wp_verify_nonce(sanitize_key($_POST['interq_rss_pi_ajax_nonce']), 'interq_rss_pi_ajax_nonce_action')) {
             wp_send_json_error(['message' => 'Invalid request']);
+        }
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Insufficient permissions']);
         }
 
         $_POST['rss_from_date'] = isset($_POST['rss_from_date']) ? sanitize_text_field(wp_unslash( $_POST['rss_from_date'])) : '';
@@ -376,6 +388,10 @@ class InterQ_Rss_Pi_Admin {
         // if there's nothing for processing or invalid data, bail
         if ( ! isset($_POST['feed']) || ! isset($_POST['interq_rss_pi_ajax_nonce']) || ! wp_verify_nonce(sanitize_key($_POST['interq_rss_pi_ajax_nonce']), 'interq_rss_pi_ajax_nonce_action') ) {
             wp_send_json_error(['message'=>'Invalid request']);
+        }
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Insufficient permissions']);
         }
 
         $_POST['feed'] = sanitize_key(wp_unslash($_POST['feed']));
