@@ -173,8 +173,11 @@ class InterQ_Rss_Pi_Engine {
 
         $args = wp_parse_args($args, $defaults);
 
-        // include the default WP feed processing functions
-        include_once(ABSPATH . WPINC . '/feed.php');
+        // load the WordPress feed API only when it is not loaded yet,
+        // and use a function from it (fetch_feed) immediately after
+        if (!function_exists('fetch_feed')) {
+            require_once ABSPATH . WPINC . '/feed.php';
+        }
 
         // fetch the feed
         $feed = fetch_feed($url);
@@ -382,21 +385,20 @@ class InterQ_Rss_Pi_Engine {
                         }
 
                         // Get Author From Feed URl
+                        // Feed content must never create user accounts: only match an
+                        // existing user, otherwise fall back to the feed's author.
+                        $post_author = $args['author_id'];
                         if (($args['automatic_import_author'] ?? '') === 'true') {
                             if ($author = $item->get_author()) {
                                 $array_author = explode(",", $author->get_name());
-                                $user_name = preg_replace('/[^A-Za-z0-9\-]/', ' ', $array_author[0]);
-                                $user_id = username_exists($user_name);
-                                if (!$user_id) {
-                                    $random_password = wp_generate_password(12, false);
-                                    $user_id = wp_create_user($user_name, $random_password, '');
+                                $user_name = trim(preg_replace('/[^A-Za-z0-9\-]/', ' ', $array_author[0]));
+                                if ($user_name !== '') {
+                                    $existing_user_id = username_exists($user_name);
+                                    if ($existing_user_id) {
+                                        $post_author = $existing_user_id;
+                                    }
                                 }
-                                $post_author = $user_id;
-                            } else {
-                                $post_author = $args['author_id'];
                             }
-                        } else {
-                            $post_author = $args['author_id'];
                         }
 
                         $post = [
@@ -566,7 +568,11 @@ class InterQ_Rss_Pi_Engine {
 
     // deprecated as of 2.1.2
     // TODO: Remove
-    private function get_domain(string $url): string|false {
+    /**
+     * @param string $url URL to parse
+     * @return string|false Domain, or false when it cannot be parsed
+     */
+    private function get_domain(string $url) {
         $pieces = wp_parse_url($url);
         $domain = $pieces['host'] ?? '';
         if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs)) {

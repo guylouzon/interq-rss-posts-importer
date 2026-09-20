@@ -157,6 +157,7 @@ if ($ajax_add || $ajax_edit):
             <tr>
                 <td>
                     <label for="<?php echo esc_html( $f['id'] ); ?>-automatic_import_author"><?php esc_html_e('Automatic import of Authors', 'interq-rss-posts-importer'); ?></label>
+                    <p class="description"><?php esc_html_e('Posts are assigned to an existing user matching the feed author name; no new user accounts are created.', 'interq-rss-posts-importer'); ?></p>
                 </td>
                 <td>
                     <ul class="radiolist">

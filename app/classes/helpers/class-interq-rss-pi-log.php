@@ -25,6 +25,10 @@ class InterQ_Rss_Pi_Log {
             wp_send_json_error(['message' => 'Invalid request']);
         }
 
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Insufficient permissions']);
+        }
+
         // get the log file's contents
         if (!file_exists(INTERQ_RSS_PI_LOG_PATH . 'log.txt')) {
             $log = 'No log file found.';
@@ -41,6 +45,10 @@ class InterQ_Rss_Pi_Log {
     public function clear_log(): void {
         if (!isset($_POST['interq_rss_pi_ajax_nonce']) || !wp_verify_nonce(sanitize_key($_POST['interq_rss_pi_ajax_nonce']), 'interq_rss_pi_ajax_nonce_action')) {
             wp_send_json_error(['message' => 'Invalid request']);
+        }
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Insufficient permissions']);
         }
 
         // get the log file

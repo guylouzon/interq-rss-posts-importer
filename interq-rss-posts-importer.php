@@ -32,7 +32,7 @@ if (!defined('INTERQ_RSS_PI_BASENAME')) {
 }
 
 if (!defined('INTERQ_RSS_PI_VERSION')) {
-    define('INTERQ_RSS_PI_VERSION', '2026.9.1');
+    define('INTERQ_RSS_PI_VERSION', '2026.9.2');
 }
 
 if (!defined('INTERQ_RSS_PI_LOG_PATH')) {

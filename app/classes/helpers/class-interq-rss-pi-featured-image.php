@@ -24,7 +24,7 @@ class InterQ_Rss_Pi_Featured_Image {
      * @param int $post_id Post id
      * @return int|false
      */
-    public function _prepare($item, int $post_id): int|false {
+    public function _prepare($item, int $post_id) {
         try {
             // Validate input parameters
             if (!$item || !is_object($item)) {
@@ -112,7 +112,14 @@ class InterQ_Rss_Pi_Featured_Image {
         }
     }
 
-    private function make_absolute_url(string $img_url, string $baseref): string|false {
+    /**
+     * Make a relative image URL absolute
+     *
+     * @param string $img_url Image URL, possibly relative
+     * @param string $baseref Base URL of the source page
+     * @return string|false Absolute URL, or false when it cannot be resolved
+     */
+    private function make_absolute_url(string $img_url, string $baseref) {
         // If already absolute URL, validate and return
         if (filter_var($img_url, FILTER_VALIDATE_URL)) {
             return $img_url;
@@ -166,7 +173,13 @@ class InterQ_Rss_Pi_Featured_Image {
     }
 
 
-    private function extract_image_url(string $content): string|false {
+    /**
+     * Extract the first image URL from post content
+     *
+     * @param string $content Post content HTML
+     * @return string|false Image URL, or false when none is found
+     */
+    private function extract_image_url(string $content) {
         // Multiple regex patterns to catch different image formats
         $patterns = [
             // Standard img tag with src
@@ -232,7 +245,7 @@ class InterQ_Rss_Pi_Featured_Image {
      * @param string|null $desc
      * @return int|\WP_Error
      */
-    private function _sideload(string $file, int $post_id, ?string $desc = null): int|\WP_Error {
+    private function _sideload(string $file, int $post_id, ?string $desc = null) {
 
         $id = 0;
 
