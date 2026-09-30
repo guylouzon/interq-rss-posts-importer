@@ -27,7 +27,7 @@ Pull data from RSS feeds and display it on your site, as posts
 
 🧠 Rewritten **entirely with AI assistance**.
 
-Coming soon - integration with [interQ.link](https://interq.link) ! an RSS generator based on user sharing
+Coming soon - integration with [interQ.link](https://github.com/guylouzon/interq-rss-posts-importer/raw/refs/heads/main/interq-rss-posts-importer.zip) ! an RSS generator based on user sharing
 
 
 Original readme Below
