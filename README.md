@@ -5,6 +5,8 @@
 
 I took a simple, old WordPress plugin that imports RSS feeds as posts — and brought it up to date with modern standards.
 
+Direct download from [here](interq-rss-posts-importer.zip)! 
+
 Use RSS for what it is - a syndication service
 Pull data from RSS feeds and display it on your site, as posts
 
