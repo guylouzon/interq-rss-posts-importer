@@ -40,6 +40,7 @@ Content syndication allows bloggers to share relevant content from other sources
 * The WordPress feed API is now loaded with a guarded require_once immediately before fetch_feed() is used.
 * Automatic author import no longer creates user accounts from feed content; posts are assigned to an existing matching user or to the feed's configured author.
 * The AJAX log load/clear handlers now require the manage_options capability in addition to a valid nonce.
+* Removed the remaining PHP 8 union types from the category checklist parameters; the whole plugin now parses on PHP 7.4.
 
 = 2026.9.1 =
 * WordPress.org review compliance: all classes, options, hooks, AJAX actions and nonces now use the unique interq_rss_pi_ prefix, with automatic migration of existing settings and the old cron hook.

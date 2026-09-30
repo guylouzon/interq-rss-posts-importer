@@ -457,12 +457,20 @@ class InterQ_Rss_Pi_Admin {
 
     /**
      * Walker class function for category multiple checkbox
+     *
+     * @param int $post_id Post ID
+     * @param int $descendants_and_self Category ID to list descendants of
+     * @param array|false $selected_cats Selected category IDs, or false for none
+     * @param array|false $popular_cats Popular category IDs, or false for none
+     * @param Walker|null $walker Category walker instance
+     * @param bool $checked_ontop Whether to move checked categories to the top
+     * @return string
      */
     public function interq_rss_pi_category_checklist(
         int $post_id = 0,
         int $descendants_and_self = 0,
-        array|false $selected_cats = false,
-        array|false $popular_cats = false,
+        $selected_cats = false,
+        $popular_cats = false,
         ?Walker $walker = null,
         bool $checked_ontop = true
     ): string {
