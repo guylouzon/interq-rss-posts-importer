@@ -30,6 +30,10 @@ Pull data from RSS feeds and display it on your site, as posts
 Coming soon - integration with [interQ.link](https://github.com/guylouzon/interq-rss-posts-importer/raw/refs/heads/main/interq-rss-posts-importer.zip) ! an RSS generator based on user sharing
 
 
+### License
+
+GPLv2 or later, see [LICENSE](LICENSE). Based on [RSS Post Importer](https://wordpress.org/plugins/rss-post-importer/) 2.5.2 by feedsapi / mobilova UG (haftungsbeschränkt), also GPLv2 or later. Changes: Copyright (C) 2025-2026 Guy Louzon. Bundled: Font Awesome 4 (SIL OFL 1.1 font, MIT CSS), Modernizr 3.12.0 (MIT).
+
 Original readme Below
 
 Starting a new changelog !

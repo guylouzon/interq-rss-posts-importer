@@ -12,6 +12,23 @@
   Text Domain: interq-rss-posts-importer
  */
 
+/*
+  Copyright (C) 2025-2026 Guy Louzon
+
+  Based on "RSS Post Importer" 2.5.2 by feedsapi / mobilova UG (haftungsbeschraenkt),
+  Copyright (C) feedsapi, released under the GNU General Public License v2 or later.
+  https://wordpress.org/plugins/rss-post-importer/
+
+  This program is free software; you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software Foundation;
+  either version 2 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+  PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  See the LICENSE file in this folder, or http://www.gnu.org/licenses/gpl-2.0.html
+ */
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 // define some constants

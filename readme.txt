@@ -33,6 +33,17 @@ Content syndication allows bloggers to share relevant content from other sources
 3. Navigate to the InterQ Rss Posts Importer menu to configure your feed sources.
 
 
+== License and credits ==
+
+InterQ Rss Posts Importer is free software, released under the GNU General Public License version 2 or later (see the LICENSE file).
+
+It is based on "RSS Post Importer" 2.5.2 by feedsapi / mobilova UG (haftungsbeschraenkt), also GPLv2 or later: https://wordpress.org/plugins/rss-post-importer/
+Changes since then: Copyright (C) 2025-2026 Guy Louzon.
+
+Bundled third-party files:
+* Font Awesome 4: font under SIL OFL 1.1, CSS under MIT (see the header of app/assets/css/style.css).
+* Modernizr 3.12.0: MIT License.
+
 == Change Log ==
 
 = 2026.9.2 =
