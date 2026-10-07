@@ -359,6 +359,10 @@ class InterQ_Rss_Pi_Engine {
                         // parse the content
                         $content = $parser->_parse($item, $args['feed_title'], $args['strip_html']);
 
+                        // Feed content is untrusted. Sanitize it before it is stored or used for image downloads.
+                        // The allowed tags are the ones wp_kses_post allows; filter interq_rss_pi_allowed_html to change them.
+                        $content = $this->sanitize_content($content);
+
                         //Filter content for /* Add rel="nofollow" to all outbounded links. */
                         if (($args['nofollow_outbound'] ?? '') === 'true') {
                             $content = $this->interq_rss_pi_url_parse_content($content);
@@ -480,6 +484,17 @@ class InterQ_Rss_Pi_Engine {
         }
 
         return $saved_posts;
+    }
+
+    /**
+     * Sanitize imported feed HTML
+     *
+     * @param string $content Parsed post content
+     * @return string
+     */
+    private function sanitize_content(string $content): string {
+        $allowed_html = apply_filters('interq_rss_pi_allowed_html', wp_kses_allowed_html('post'));
+        return wp_kses($content, $allowed_html);
     }
 
     /**
@@ -734,9 +749,13 @@ public function add_to_media(string $url, int $associated_with_post, string $des
         return false;
     }
     
-    // Check if URL is reachable with wp_remote_head first
-    $response = wp_remote_head($url, array(
+    // Check if URL is reachable with wp_safe_remote_head first.
+    // The URL comes from a feed, so it must never reach internal hosts: the safe variant
+    // sets reject_unsafe_urls (blocks private/loopback addresses and odd ports, also on redirects)
+    $response = wp_safe_remote_head($url, array(
         'timeout' => 10,
+        'redirection' => 3,
+        'reject_unsafe_urls' => true,
         'user-agent' => 'Mozilla/5.0 (compatible; RSS Post Importer)'
     ));
     
@@ -759,7 +778,7 @@ public function add_to_media(string $url, int $associated_with_post, string $des
     }
     
     // Download the file
-    $tmp = download_url($url, 10); // 10 second timeout
+    $tmp = interq_rss_pi_download_image($url, 10); // 10 second timeout, http(s) only, size limited
     
     if (is_wp_error($tmp)) {
         $this->err_log("RSS PI: Download failed: " . $tmp->get_error_message());

@@ -256,11 +256,11 @@ class InterQ_Rss_Pi_Featured_Image {
             $file_array['name'] = basename($file);
 
             // Download file to temp location.
-            $file_array['tmp_name'] = @download_url($file);
+            $file_array['tmp_name'] = interq_rss_pi_download_image($file);
 
             // If error storing temporarily, return the error.
+            // (nothing to delete here: wp_delete_file() on a WP_Error is a TypeError on PHP 8)
             if (is_wp_error($file_array['tmp_name'])) {
-                @wp_delete_file($file_array['tmp_name']);
                 $file_array['tmp_name'] = '';
                 return $file_array['tmp_name'];
             }
