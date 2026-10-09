@@ -208,7 +208,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
                                 <ul class="radiolist">
                                     <li>
                                         <label>
-                                            <input type="radio" id="enable_logging_true" name="enable_logging" value="true" <?php checked($this->options['settings']['enable_logging'], 'true'); ?> /> 
+                                            <input type="radio" id="enable_logging_true" name="enable_logging" value="true" <?php checked(in_array($this->options['settings']['enable_logging'], ['true', true], true)); ?> /> 
                                             <?php esc_html_e('Yes', 'interq-rss-posts-importer'); ?>
                                         </label>
                                     </li>

@@ -75,17 +75,24 @@ class InterQ_Rss_Pi_Log {
      * @param int $post_count Number of posts imported
      * @return void
      */
-    public static function log(int $post_count): void {
+    public static function log(int $post_count, string $context = ''): void {
 
         global $interq_rss_post_importer;
 
-        // if logging is disabled, return early
-        if (($interq_rss_post_importer->options['settings']['enable_logging'] ?? '') !== 'true') {
+        // if logging is disabled, return early. the setting is the string 'true' once saved from the settings form,
+        // but the built in default is a boolean true, so both count as enabled
+        $enable_logging = $interq_rss_post_importer->options['settings']['enable_logging'] ?? '';
+        if ($enable_logging !== 'true' && $enable_logging !== true) {
             return;
         }
 
         // prepare the log entry
-        $log = gmdate("Y-m-d H:i:s") . "\t Imported " . $post_count . " new posts. \n";
+        $log = gmdate("Y-m-d H:i:s") . "\t Imported " . $post_count . " new posts." . ($context !== '' ? ' (' . $context . ')' : '') . " \n";
+
+        // the log folder is created when the plugin loads, make sure it is still there (uploads cleaned, site moved)
+        if (!is_dir(INTERQ_RSS_PI_LOG_PATH)) {
+            wp_mkdir_p(INTERQ_RSS_PI_LOG_PATH);
+        }
 
         $log_file = INTERQ_RSS_PI_LOG_PATH . 'log.txt';
 
@@ -94,3 +101,4 @@ class InterQ_Rss_Pi_Log {
     }
 
 }
+

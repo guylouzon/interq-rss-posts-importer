@@ -106,12 +106,13 @@ class InterQ_Rss_Pi_Admin {
         global $interq_rss_post_importer;
 
         $engine = new InterQ_Rss_Pi_Engine();
-        $post_count = $engine->import_feed();
+        $post_count = $engine->import_feed('manual fetch');
 
         wp_redirect( add_query_arg(
             [
                 'fetch_now' => 'done',
                 'imported'  => $post_count,
+                'logging'   => in_array( $interq_rss_post_importer->options['settings']['enable_logging'] ?? '', [ 'true', true ], true ) ? 'on' : 'off',
             ],
             $interq_rss_post_importer->page_link
         ) );
@@ -261,6 +262,9 @@ class InterQ_Rss_Pi_Admin {
                         $fetch_now_count
                     )
                 ) . '</strong></p></div>';
+            if ( 'off' === filter_input( INPUT_GET, 'logging', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) ) {
+                echo '<div class="notice notice-warning"><p>' . esc_html__( 'Logging is off, so this fetch was not written to the log. Turn on "Enable logging" in the settings.', 'interq-rss-posts-importer' ) . '</p></div>';
+            }
 
             // show the feeds that could not be fetched or imported, so a failed fetch is never silent
             foreach ( (array) ( $this->options['feeds'] ?? [] ) as $fetched_feed ) {
@@ -608,3 +612,4 @@ class InterQ_Rss_Pi_Admin {
     }
 
 }
+

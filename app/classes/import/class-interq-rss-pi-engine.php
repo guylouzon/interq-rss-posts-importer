@@ -48,7 +48,7 @@ class InterQ_Rss_Pi_Engine {
      *
      * @return int
      */
-    public function import_feed(): int {
+    public function import_feed(string $context = ''): int {
         global $interq_rss_post_importer;
         $this->load_options();
         $post_count = 0;
@@ -86,7 +86,7 @@ class InterQ_Rss_Pi_Engine {
 
         // log this
 //        InterQ_Rss_Pi_Log::log($post_count);
-        $this->log->log($post_count);
+        $this->log->log($post_count, $context);
 
         return $post_count;
     }
@@ -954,3 +954,4 @@ public function download_images_locally_regex_fallback(array $post): array {
     }
 
 }
+
