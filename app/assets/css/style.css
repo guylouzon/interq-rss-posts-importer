@@ -309,3 +309,6 @@ display:none;
 }
 /* Feed table: keep the preloaded hidden new-feed rows out of sight (moved from inline <style> in feed-table.php) */
 .rss_pi-table tfoot tr.data-row,.rss_pi-table tfoot tr.edit-row{display:none;}
+
+.rss_pi-last-fetch { margin-top: 4px; font-size: 12px; color: #646970; }
+.rss_pi-last-fetch-error { color: #b32d2e; font-weight: 600; }

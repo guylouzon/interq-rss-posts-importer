@@ -15,6 +15,13 @@ class InterQ_Rss_Pi_Engine {
     public array $options = [];
     
     public InterQ_Rss_Pi_Log $log;
+
+    /**
+     * Result of the last feed import: time, found, imported, skipped, failed, error
+     *
+     * @var array
+     */
+    public array $last_result = [];
     /**
      * Start the engine
      *
@@ -48,12 +55,15 @@ class InterQ_Rss_Pi_Engine {
         // filter cache lifetime
         add_filter('wp_feed_cache_transient_lifetime', [$this, 'frequency']);
 
-        foreach ($this->options['feeds'] as $f) {
+        foreach ($this->options['feeds'] as $k => $f) {
 
             // prepare, import feed and count imported posts
             if ($items = $this->do_import($f)) {
                 $post_count += count($items);
             }
+
+            // remember what happened with this feed, so it can be shown to the user
+            $this->options['feeds'][$k]['last_fetch'] = $this->last_result;
         }
 
         // reformulate import count
@@ -151,9 +161,17 @@ class InterQ_Rss_Pi_Engine {
      */
     private function _import(string $url = '', array $args = []): ?array {
 
-        if (empty($url)) return null;
+        $this->last_result = ['time' => time(), 'found' => 0, 'imported' => 0, 'skipped' => 0, 'failed' => 0, 'error' => ''];
 
-        if (($args['feed_status'] ?? '') === 'pause') return null;
+        if (empty($url)) {
+            $this->last_result['error'] = 'No feed URL is set.';
+            return null;
+        }
+
+        if (($args['feed_status'] ?? '') === 'pause') {
+            $this->last_result['error'] = 'Feed is paused, it was not fetched.';
+            return null;
+        }
 
         $defaults = [
             'feed_title' => '',
@@ -183,11 +201,16 @@ class InterQ_Rss_Pi_Engine {
         $feed = fetch_feed($url);
 
         if (is_wp_error($feed)) {
+            $this->last_result['error'] = 'Could not fetch or parse the feed: ' . $feed->get_error_message();
             return null;
         }
 
         // save as posts
         $posts = $this->save($feed, $args);
+
+        if ($this->last_result['found'] === 0 && $this->last_result['error'] === '') {
+            $this->last_result['error'] = 'No items found in the feed (or none matched the keywords).';
+        }
 
         return $posts;
     }
@@ -328,6 +351,7 @@ class InterQ_Rss_Pi_Engine {
      */
     private function insert(array $items, array $args = []): array {
         $saved_posts = [];
+        $this->last_result['found'] = count($items);
 
         // Initialise the content parser
         $parser = new InterQ_Rss_Pi_Parser($this->options);
@@ -439,6 +463,9 @@ class InterQ_Rss_Pi_Engine {
 
                         // insert as post
                         $post_id = $this->_insert($post, $item->get_permalink());
+                        if (!$post_id) {
+                            throw new \Exception('WordPress could not insert the post "' . $item->get_title() . '".');
+                        }
 
                         // set thumbnail
                         if (($this->options['settings']['disable_thumbnail'] ?? '') === 'false'  || (string)($this->options['settings']['disable_thumbnail'] ?? '') === 'false') {
@@ -474,10 +501,16 @@ class InterQ_Rss_Pi_Engine {
                         // canonical_urls
                         update_post_meta($post_id, 'rss_pi_canonical_url', $args['canonical_urls']);
                         $saved_posts[] = $post;
+                        $this->last_result['imported']++;
+                    } else {
+                        // already imported earlier (or deleted by the user)
+                        $this->last_result['skipped']++;
                     }
 
                 } catch (\Throwable $e) {
                     $this->err_log('RSS PI: skipping feed item after error: ' . $e->getMessage());
+                    $this->last_result['failed']++;
+                    $this->last_result['error'] = 'Import failed for ' . $this->last_result['failed'] . ' item(s): ' . $e->getMessage();
                     continue;
                 }
             }

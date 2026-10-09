@@ -261,6 +261,28 @@ class InterQ_Rss_Pi_Admin {
                         $fetch_now_count
                     )
                 ) . '</strong></p></div>';
+
+            // show the feeds that could not be fetched or imported, so a failed fetch is never silent
+            foreach ( (array) ( $this->options['feeds'] ?? [] ) as $fetched_feed ) {
+                if ( ! empty( $fetched_feed['last_fetch']['error'] ) ) {
+                    echo '<div class="notice notice-warning"><p>' .
+                        esc_html( ( $fetched_feed['name'] ?? '' ) . ': ' . $fetched_feed['last_fetch']['error'] ) .
+                        '</p></div>';
+                }
+            }
+        }
+
+        // new feeds that were not saved because the url was missing or invalid
+        $skipped_key   = 'interq_rss_pi_skipped_feeds_' . get_current_user_id();
+        $skipped_feeds = get_transient( $skipped_key );
+        if ( ! empty( $skipped_feeds ) && is_array( $skipped_feeds ) ) {
+            delete_transient( $skipped_key );
+            echo '<div class="notice notice-error"><p>' .
+                esc_html( sprintf(
+                    /* translators: %s: comma separated feed names */
+                    __( 'These new feeds were not saved because the feed URL is missing or is not a valid http(s) URL: %s', 'interq-rss-posts-importer' ),
+                    implode( ', ', $skipped_feeds )
+                ) ) . '</p></div>';
         }
 
         // 1. Success Messages
@@ -418,6 +440,7 @@ class InterQ_Rss_Pi_Admin {
 
         // prepare, import feed and count imported posts
         $items = $engine->do_import($f);
+        $this->options['feeds'][$_found]['last_fetch'] = $engine->last_result;
         if ( $items ) {
             $post_count += count($items);
         }

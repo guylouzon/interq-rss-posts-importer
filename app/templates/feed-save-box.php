@@ -34,7 +34,6 @@
         <i class="icon-star"></i>
         <i class="icon-star"></i>
         <i class="icon-star"></i>
-        <!--p class="description"><a href="http://wordpress.org/plugins/rss-posts-importer/" target="_blank">Please support this plugin by rating it!</a></p -->
     </div>
 <?php endif; ?>
 

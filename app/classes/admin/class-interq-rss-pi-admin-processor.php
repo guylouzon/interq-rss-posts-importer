@@ -54,6 +54,12 @@ class InterQ_Rss_Pi_Admin_Processor {
             }
 
             if ( in_array( $feed['id'], $modified_feeds, true ) ) {
+                // The edit row of this feed was not part of the submitted form, so there is nothing to
+                // save. Keep the stored feed instead of overwriting it with empty values.
+                if ( ! isset( $_POST[ $feed['id'] . '-name' ] ) && ! isset( $_POST[ $feed['id'] . '-url' ] ) ) {
+                    continue;
+                }
+
                 $keywords = [];
                 $keyword_str = isset( $_POST[ $feed['id'] . '-keywords' ] ) ? sanitize_text_field( wp_unslash( $_POST[ $feed['id'] . '-keywords' ] ) ) : '';
                 if ( ! empty( $keyword_str ) ) {
@@ -64,8 +70,9 @@ class InterQ_Rss_Pi_Admin_Processor {
                 $feed['name'] = isset( $_POST[ $feed['id'] . '-name' ] ) ? sanitize_text_field( wp_unslash( $_POST[ $feed['id'] . '-name' ] ) ) : '';
                 $feed['max_posts'] = isset( $_POST[ $feed['id'] . '-max_posts' ] ) ? intval( wp_unslash( $_POST[ $feed['id'] . '-max_posts' ] ) ) : 0;
                 $feed['author_id'] = intval( $_POST['author_id'] ?? ( $feed['author_id'] ?? 1 ) );
-                $feed['category_id'] = isset( $_POST[ $feed['id'] . '-category_id' ] ) ? sanitize_text_field( wp_unslash( $_POST[ $feed['id'] . '-category_id' ] ) ) : '';
-                $feed['tags_id'] = isset( $_POST[ $feed['id'] . '-tags_id' ] ) ? sanitize_text_field( wp_unslash( $_POST[ $feed['id'] . '-tags_id' ] ) ) : '';
+                // categories and tags are posted as arrays of checkbox values
+                $feed['category_id'] = isset( $_POST[ $feed['id'] . '-category_id' ] ) ? array_map( 'intval', (array) wp_unslash( $_POST[ $feed['id'] . '-category_id' ] ) ) : '';
+                $feed['tags_id'] = isset( $_POST[ $feed['id'] . '-tags_id' ] ) ? array_map( 'intval', (array) wp_unslash( $_POST[ $feed['id'] . '-tags_id' ] ) ) : '';
                 $feed['keywords'] = array_map( 'trim', $keywords );
                 $feed['strip_html'] = isset( $_POST[ $feed['id'] . '-strip_html' ] ) ? sanitize_text_field( wp_unslash( $_POST[ $feed['id'] . '-strip_html' ] ) ) : '';
                 $feed['nofollow_outbound'] = isset( $_POST[ $feed['id'] . '-nofollow_outbound' ] ) ? sanitize_text_field( wp_unslash( $_POST[ $feed['id'] . '-nofollow_outbound' ] ) ) : '';
@@ -77,6 +84,7 @@ class InterQ_Rss_Pi_Admin_Processor {
             }
         }
 
+        $skipped_feeds = [];
         foreach ($new_feeds as $id) {
             if (!$id)  continue;
 
@@ -91,14 +99,24 @@ class InterQ_Rss_Pi_Admin_Processor {
 
             $feed_status = in_array($id, $paused_feeds) ? 'pause' : 'active';
 
+            // A new feed needs a valid http(s) url. Do not store an empty feed that can never be fetched.
+            $new_url = esc_url_raw(sanitize_text_field(wp_unslash($_POST[$id . '-url'] ?? '')), ['http', 'https']);
+            if ($new_url === '') {
+                $new_name = sanitize_text_field(wp_unslash($_POST[$id . '-name'] ?? ''));
+                if ($new_name !== '' || isset($_POST[$id . '-url'])) {
+                    $skipped_feeds[] = $new_name !== '' ? $new_name : $id;
+                }
+                continue;
+            }
+
             $feeds[] = [
                 'id' => $id,
                 'url' => sanitize_text_field(wp_unslash($_POST[$id . '-url'] ?? '')),
                 'name' => sanitize_text_field(wp_unslash($_POST[$id . '-name'] ?? '')),
                 'max_posts' => intval(sanitize_text_field(wp_unslash($_POST[$id . '-max_posts'] ?? 0))),
                 'author_id' => intval($_POST['author_id'] ?? 1),
-                'category_id' => sanitize_text_field(wp_unslash($_POST[$id . '-category_id'] ?? '')),
-                'tags_id' => sanitize_text_field(wp_unslash($_POST[$id . '-tags_id'] ?? '')),
+                'category_id' => array_map('intval', (array) wp_unslash($_POST[$id . '-category_id'] ?? [])),
+                'tags_id' => array_map('intval', (array) wp_unslash($_POST[$id . '-tags_id'] ?? [])),
                 'keywords' => array_map('trim', $keywords),
                 'strip_html' => sanitize_text_field(wp_unslash($_POST[$id . '-strip_html'] ?? '')),
                 'nofollow_outbound' => sanitize_text_field(wp_unslash($_POST[$id . '-nofollow_outbound'] ?? '')),
@@ -107,6 +125,11 @@ class InterQ_Rss_Pi_Admin_Processor {
                 'canonical_urls' => sanitize_text_field(wp_unslash($_POST[$id . '-canonical_urls'] ?? '')),
                 'feed_status' => $feed_status
             ];
+        }
+
+        // tell the user about new feeds that were not saved because the url is missing or invalid
+        if (!empty($skipped_feeds)) {
+            set_transient('interq_rss_pi_skipped_feeds_' . get_current_user_id(), $skipped_feeds, 5 * MINUTE_IN_SECONDS);
         }
 
         return $feeds;

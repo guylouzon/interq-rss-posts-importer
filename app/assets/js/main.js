@@ -54,14 +54,22 @@ document.addEventListener('DOMContentLoaded', function () {
         const editRow = $('#edit_' + target);
 
         if (displayRow.classList.contains('show')) {
-            if (editRow) editRow.remove();
-            displayRow.classList.toggle('show');
-            if (index > -1) modified.splice(index, 1);
+            // Only hide the edit row. Removing it would throw away what was typed or ticked,
+            // and Save All would then store empty values for this feed.
+            if (editRow) editRow.classList.remove('show');
+            displayRow.classList.remove('show');
             return false;
         } else {
             if (index === -1) modified.push(target);
         }
         $('#modified_feeds').value = modified.join(',');
+
+        // the edit row was loaded before: show it again instead of loading a fresh copy over the typed values
+        if (editRow) {
+            editRow.classList.add('show');
+            displayRow.classList.add('show');
+            return false;
+        }
 
         ajax({
             type: 'POST',

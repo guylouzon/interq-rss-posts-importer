@@ -92,7 +92,24 @@ if ($ajax_add || !$ajax_edit):
             <?php } ?>
         </div>
     </td>
-    <td class="rss_pi-feed_url"><span class="field-url"><?php echo esc_url(stripslashes($f['url'])); ?></span></td>
+    <td class="rss_pi-feed_url"><span class="field-url"><?php echo esc_url(stripslashes($f['url'])); ?></span>
+        <?php if (!empty($f['last_fetch']) && is_array($f['last_fetch'])): $lf = $f['last_fetch']; ?>
+        <div class="rss_pi-last-fetch">
+            <?php
+            echo esc_html(sprintf(
+                /* translators: 1: date and time, 2: items found, 3: posts imported, 4: items skipped */
+                __('Last fetch: %1$s - found %2$d, imported %3$d, skipped %4$d', 'interq-rss-posts-importer'),
+                wp_date(get_option('date_format') . ' ' . get_option('time_format'), intval($lf['time'] ?? 0)),
+                intval($lf['found'] ?? 0),
+                intval($lf['imported'] ?? 0),
+                intval($lf['skipped'] ?? 0)
+            ));
+            if (!empty($lf['error'])): ?>
+            <br /><span class="rss_pi-last-fetch-error"><?php echo esc_html($lf['error']); ?></span>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+    </td>
     <td class="rss_pi_feed_max_posts"><span class="field-max_posts"><?php echo esc_html($f['max_posts']); ?></span></td>
    <!-- <td width="20%"><?php //echo $category;  ?></td>-->
 </tr>
