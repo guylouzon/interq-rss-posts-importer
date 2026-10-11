@@ -52,6 +52,8 @@ Bundled third-party files:
 * Automatic author import no longer creates user accounts from feed content; posts are assigned to an existing matching user or to the feed's configured author.
 * The AJAX log load/clear handlers now require the manage_options capability in addition to a valid nonce.
 * Removed the remaining PHP 8 union types from the category checklist parameters; the whole plugin now parses on PHP 7.4.
+* Removed the obsolete rsspiadmin.js sample-data script that was still loaded on the settings page and caused JavaScript console errors; the settings page is handled by main.js only.
+* README.md now describes only the current plugin; the legacy 2.5.2 readme text was removed.
 
 = 2026.9.1 =
 * WordPress.org review compliance: all classes, options, hooks, AJAX actions and nonces now use the unique interq_rss_pi_ prefix, with automatic migration of existing settings and the old cron hook.

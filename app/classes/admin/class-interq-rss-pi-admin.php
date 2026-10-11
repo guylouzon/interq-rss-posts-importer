@@ -151,7 +151,6 @@ class InterQ_Rss_Pi_Admin {
         wp_enqueue_script('modernizr', INTERQ_RSS_PI_URL . 'app/assets/js/modernizr.custom.32882.js', [], INTERQ_RSS_PI_VERSION, true);
         wp_enqueue_script('phpjs-uniqid', INTERQ_RSS_PI_URL . 'app/assets/js/uniqid.js', [], INTERQ_RSS_PI_VERSION, true);
         wp_enqueue_script('rss-pi', INTERQ_RSS_PI_URL . 'app/assets/js/main.js', ['jquery'], INTERQ_RSS_PI_VERSION, true);
-        wp_enqueue_script('rss-pi-admin', INTERQ_RSS_PI_URL . 'app/assets/js/rsspiadmin.js', ['jquery'], INTERQ_RSS_PI_VERSION, true);
         wp_register_script(
                 'rss-pi-import-trigger', 
                 INTERQ_RSS_PI_URL . 'app/assets/js/admin-import.js', 
